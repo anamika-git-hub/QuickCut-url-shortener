@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Delete, Body, Param, UseGuards, Req, Res } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UrlsService } from './urls.service';
-import { CreateUrlDto } from './dto/create-user.dto';
+import { CreateUrlDto } from './dto/create-url.dto';
 import { Response } from 'express';
 
 @Controller('urls')
@@ -23,7 +23,7 @@ export class UrlsController {
   @Get(':shortCode')
 async redirect(@Param('shortCode') shortCode: string, @Res() res: Response) {
   const url = await this.urlsService.findByShortCode(shortCode);
-  await this.urlsService.incrementClicks(url._id as unknown as string);
+  await this.urlsService.incrementClicks(url.id as unknown as string);
   res.redirect(url.originalUrl);
 }
 

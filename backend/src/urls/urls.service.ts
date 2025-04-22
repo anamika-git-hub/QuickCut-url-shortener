@@ -1,46 +1,51 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import { randomBytes } from 'crypto';
-import { Url, UrlDocument } from './schemas/url.schema';
-import { CreateUrlDto } from './dto/create-user.dto';
+import { CreateUrlDto } from './dto/create-url.dto';
+import { UrlsRepository } from './repositories/urls.repository';
+import { Url } from '../common/interfaces/entities/url.entity';
 
 @Injectable()
 export class UrlsService {
-  constructor(@InjectModel(Url.name) private urlModel: Model<UrlDocument>) {}
+  constructor(private readonly urlsRepository: UrlsRepository) {}
 
   async create(createUrlDto: CreateUrlDto, userId: string): Promise<Url> {
+    
     const shortCode = randomBytes(6).toString('base64url').substring(0, 8);
     
-    const newUrl = new this.urlModel({
+    return this.urlsRepository.create({
       originalUrl: createUrlDto.originalUrl,
       shortCode,
       owner: userId,
+      clicks: 0,
     });
-    
-    return newUrl.save();
   }
 
   async findAll(userId: string): Promise<Url[]> {
-    return this.urlModel.find({ owner: userId }).exec();
+    return this.urlsRepository.findByOwner(userId);
   }
 
-  async findByShortCode(shortCode: string): Promise<UrlDocument> {
-    const url = await this.urlModel.findOne({ shortCode }).exec();
+  async findByShortCode(shortCode: string): Promise<Url> {
+    const url = await this.urlsRepository.findByShortCode(shortCode);
     if (!url) {
       throw new NotFoundException('URL not found');
     }
     return url;
-  }   
+  }
 
   async incrementClicks(urlId: string): Promise<void> {
-    await this.urlModel.findByIdAndUpdate(urlId, { $inc: { clicks: 1 } }).exec();
+    await this.urlsRepository.incrementClicks(urlId);
   }
 
   async delete(id: string, userId: string): Promise<void> {
-    const result = await this.urlModel.deleteOne({ _id: id, owner: userId }).exec();
-    if (result.deletedCount === 0) {
+    const url = await this.urlsRepository.findById(id);
+    
+    if (!url || url.owner.toString() !== userId) {
       throw new NotFoundException('URL not found or you do not have permission to delete it');
+    }
+    
+    const deleted = await this.urlsRepository.delete(id);
+    if (!deleted) {
+      throw new NotFoundException('Failed to delete URL');
     }
   }
 }

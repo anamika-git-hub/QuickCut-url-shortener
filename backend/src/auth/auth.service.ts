@@ -14,10 +14,10 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     const user = await this.usersService.create(registerDto);
-    const payload = { email: user.email, sub: user._id };
+    const payload = { email: user.email, sub: user.id };
     return {
       user: {
-        id: user._id,
+        id: user.id,
         email: user.email,
         username: user.username,
       },
@@ -39,10 +39,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
     
-    const payload = { email: user.email, sub: user._id };
+    const payload = { email: user.email, sub: user.id };
     return {
       user: {
-        id: user._id,
+        id: user.id,
         email: user.email,
         username: user.username,
       },
