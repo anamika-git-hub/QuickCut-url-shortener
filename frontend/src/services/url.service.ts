@@ -1,7 +1,7 @@
 import api from './api';
 
 export interface Url {
-  _id: string;
+  id: string;
   originalUrl: string;
   shortCode: string;
   owner: string;
