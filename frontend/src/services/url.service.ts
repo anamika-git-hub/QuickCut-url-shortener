@@ -8,6 +8,7 @@ export interface Url {
   clicks: number;
   createdAt: string;
   updatedAt: string;
+  displayUrl: string;
 }
 
 export interface CreateUrlData {
