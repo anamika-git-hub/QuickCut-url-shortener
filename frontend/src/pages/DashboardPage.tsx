@@ -8,15 +8,14 @@ const DashboardPage = () => {
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleUrlCreated = () => {
-    // Force a refresh of the URL list
     setRefreshKey((prevKey) => prevKey + 1);
   };
 
   return (
     <div>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-lg text-gray-600">Welcome, {user?.username || 'User'}!</p>
+        <h1 className="text-3xl font-bold text-teal-800 mb-2">Dashboard</h1>
+        <p className="text-lg text-teal-600">Welcome, {user?.username || 'User'}!</p>
       </div>
       
       <UrlForm onUrlCreated={handleUrlCreated} />
